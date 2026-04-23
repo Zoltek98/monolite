@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<SummaryData | null>(null);
 
   useEffect(() => {
-    axios.get('http://api.casa-boschetto.com.com/api/dashboard/summary')
+    axios.get('https://api.casa-boschetto.com/api/dashboard/summary')
       .then(res => setData(res.data))
       .catch(err => console.error(err));
   }, []);

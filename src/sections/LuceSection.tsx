@@ -31,7 +31,7 @@ const LuceSection: React.FC = () => {
     }, [data]);
 
   useEffect(() => {
-    axios.get<ILuce[]>('http://api.casa-boschetto.com.com/api/luce')
+    axios.get<ILuce[]>('https://api.casa-boschetto.com/api/luce')
       .then(res => {
         setData(res.data);
         setLoading(false);

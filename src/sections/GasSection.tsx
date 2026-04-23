@@ -9,7 +9,7 @@ const GasSection: React.FC = () => {
   const [data, setData] = useState<IGas[]>([]);
 
   useEffect(() => {
-    axios.get<IGas[]>('http://api.casa-boschetto.com.com/api/gas').then(res => setData(res.data));
+    axios.get<IGas[]>('https://api.casa-boschetto.com/api/gas').then(res => setData(res.data));
   }, []);
 
   const stats = useMemo(() => {

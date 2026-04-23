@@ -12,7 +12,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://api.casa-boschetto.com/api/login', { username, password });
+      const res = await axios.post('https://api.casa-boschetto.com/api/login', { username, password });
       onLogin(res.data.token);
     } catch (err) {
       alert("Accesso negato");
