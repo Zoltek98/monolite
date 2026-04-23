@@ -12,24 +12,38 @@ const InvestmentsSection: React.FC = () => {
   const [history, setHistory] = useState<IPortfolioHistory[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<IAsset | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Caricamento dati
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  // Caricamento dati con Token
   const fetchData = async () => {
+    const token = localStorage.getItem('token');
     try {
+      setLoading(true);
       const [resAssets, resHistory] = await Promise.all([
-        axios.get<IAsset[]>('https://api.casa-boschetto.com/api/assets'),
-        axios.get<IPortfolioHistory[]>('https://api.casa-boschetto.com/api/portfolio-history')
+        axios.get<IAsset[]>(`${API_URL}/api/assets`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get<IPortfolioHistory[]>(`${API_URL}/api/portfolio-history`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
       ]);
       setAssets(resAssets.data);
       setHistory(resHistory.data);
     } catch (err) {
       console.error("Errore caricamento investimenti:", err);
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        alert("Sessione scaduta");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => { fetchData(); }, []);
 
-  // Calcolo dati per la torta (Valore monetario per ogni asset)
+  // Calcolo dati per la torta
   const pieData = useMemo(() => {
     return assets.map(a => ({
       name: a.name,
@@ -40,17 +54,21 @@ const InvestmentsSection: React.FC = () => {
 
   const totalPortfolioValue = pieData.reduce((sum, item) => sum + item.value, 0);
 
-  // Gestione Salvataggio Modifiche
+  // Gestione Salvataggio Modifiche (anche qui serve il token!)
   const handleUpdateAsset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedAsset) return;
 
+    const token = localStorage.getItem('token');
     try {
-      await axios.put(`https://api.casa-boschetto.com/api/assets/${selectedAsset.id}`, {
+      await axios.put(`${API_URL}/api/assets/${selectedAsset.id}`, {
         name: selectedAsset.name,
         shares: selectedAsset.shares,
         color: selectedAsset.color
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
+      
       setIsModalOpen(false);
       fetchData(); // Rinfresca i dati
     } catch (err) {
@@ -58,14 +76,15 @@ const InvestmentsSection: React.FC = () => {
     }
   };
 
+  if (loading && assets.length === 0) return <div className="loading">Analisi portafoglio...</div>;
+
   return (
     <div className="section animate-in">
       <header className="section-header">
-        <h2>Patrimonio Investito: {totalPortfolioValue.toFixed(2)}€</h2>
+        <h2>Patrimonio Investito: {totalPortfolioValue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}€</h2>
       </header>
 
       <div className="investments-dashboard">
-        {/* GRAFICO A TORTA */}
         <div className="chart-box">
           <h3>Asset Allocation</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -83,23 +102,25 @@ const InvestmentsSection: React.FC = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-             <ChartTooltip 
-                // Rimuoviamo il tipo esplicito ": number" e usiamo un controllo di sicurezza
-                formatter={(value: any) => value ? `${Number(value).toFixed(2)}€` : '0.00€'}
+              <ChartTooltip 
+                formatter={(value: any) => `${Number(value).toFixed(2)}€`}
                 contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px' }}
-                />
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* GRAFICO ANDAMENTO STORICO */}
         <div className="chart-box">
           <h3>Performance Totale</h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={history}>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
               <XAxis dataKey="date" stroke="#94a3b8" tick={{fontSize: 10}} />
-              <YAxis stroke="#94a3b8" domain={['auto', 'auto']} tickFormatter={(v) => `${v}€`} />
+              <YAxis 
+                stroke="#94a3b8" 
+                domain={['auto', 'auto']} 
+                tickFormatter={(v) => `${v.toLocaleString('it-IT')}€`} 
+              />
               <ChartTooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none' }} />
               <Line type="monotone" dataKey="total_value" stroke="#10b981" strokeWidth={3} dot={false} />
             </LineChart>
@@ -107,7 +128,6 @@ const InvestmentsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* TABELLA ASSET */}
       <DataTable 
         columns={['Asset', 'Ticker', 'Prezzo', 'Quote', 'Totale', 'Azione']}
         data={assets}
@@ -120,7 +140,9 @@ const InvestmentsSection: React.FC = () => {
             <td className="text-muted">{asset.ticker}</td>
             <td>{Number(asset.currentPrice).toFixed(2)}€</td>
             <td>{asset.shares}</td>
-            <td className="price-cell">{(asset.shares * asset.currentPrice).toFixed(2)}€</td>
+            <td className="price-cell">
+                {(Number(asset.shares) * Number(asset.currentPrice)).toFixed(2)}€
+            </td>
             <td>
               <button className="btn-edit" onClick={() => { setSelectedAsset(asset); setIsModalOpen(true); }}>
                 Modifica
@@ -130,7 +152,6 @@ const InvestmentsSection: React.FC = () => {
         )}
       />
 
-      {/* MODAL / DIALOG DI MODIFICA */}
       {isModalOpen && selectedAsset && (
         <div className="modal-overlay">
           <div className="modal-content">
