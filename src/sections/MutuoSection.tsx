@@ -9,7 +9,7 @@ const MutuoSection: React.FC = () => {
   const [data, setData] = useState<IMutuo[]>([]);
 
   useEffect(() => {
-    axios.get<IMutuo[]>('http://localhost:3000/api/mutuo').then(res => setData(res.data));
+    axios.get<IMutuo[]>('http://api.casa-boschetto.com/api/mutuo').then(res => setData(res.data));
   }, []);
 
   // Calcolo Statistiche

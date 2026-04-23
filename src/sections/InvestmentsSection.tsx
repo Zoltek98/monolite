@@ -17,8 +17,8 @@ const InvestmentsSection: React.FC = () => {
   const fetchData = async () => {
     try {
       const [resAssets, resHistory] = await Promise.all([
-        axios.get<IAsset[]>('http://localhost:3000/api/assets'),
-        axios.get<IPortfolioHistory[]>('http://localhost:3000/api/portfolio-history')
+        axios.get<IAsset[]>('http://api.casa-boschetto.com/api/assets'),
+        axios.get<IPortfolioHistory[]>('http://api.casa-boschetto.com/api/portfolio-history')
       ]);
       setAssets(resAssets.data);
       setHistory(resHistory.data);
@@ -46,7 +46,7 @@ const InvestmentsSection: React.FC = () => {
     if (!selectedAsset) return;
 
     try {
-      await axios.put(`http://localhost:3000/api/assets/${selectedAsset.id}`, {
+      await axios.put(`http://api.casa-boschetto.com/api/assets/${selectedAsset.id}`, {
         name: selectedAsset.name,
         shares: selectedAsset.shares,
         color: selectedAsset.color
