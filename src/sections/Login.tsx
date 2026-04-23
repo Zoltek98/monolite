@@ -10,8 +10,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Usiamo la variabile d'ambiente definita su Vercel
-  const API_URL = import.meta.env.VITE_API_URL;
+  // @ts-ignore
+  const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>🔒 Accesso Riservato</h2>
+        <h2>Accesso Riservato</h2>
         <form onSubmit={handleSubmit}>
           <input 
             type="text" 
