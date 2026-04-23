@@ -10,7 +10,7 @@ const GasSection: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
     setLoading(true);
     axios.get<IGas[]>(`${API_URL}/api/gas`, {

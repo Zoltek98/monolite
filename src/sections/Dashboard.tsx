@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // 1. Recuperiamo il token dal localStorage (salvato al login)
     const token = localStorage.getItem('token');
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
     // 2. Eseguiamo la chiamata includendo l'Authorization Header
     axios.get(`${API_URL}/api/dashboard/summary`, {

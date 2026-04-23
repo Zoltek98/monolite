@@ -11,7 +11,7 @@ const LuceSection: React.FC = () => {
   const [data, setData] = useState<ILuce[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
   const stats = useMemo(() => {
     if (data.length === 0) return null;

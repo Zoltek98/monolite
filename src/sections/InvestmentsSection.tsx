@@ -14,7 +14,7 @@ const InvestmentsSection: React.FC = () => {
   const [selectedAsset, setSelectedAsset] = useState<IAsset | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL;
+ const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
   // Caricamento dati con Token
   const fetchData = async () => {
