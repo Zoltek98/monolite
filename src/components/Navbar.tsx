@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 
 interface NavbarProps {
-  activeTab: 'mutuo' | 'luce' | 'gas' | 'investimenti';
-  setActiveTab: (tab: 'mutuo' | 'luce' | 'gas' | 'investimenti') => void;
+  activeTab: string;
+  setActiveTab: (tab: any) => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTabClick = (tab: 'mutuo' | 'luce' | 'gas' | 'investimenti') => {
+  const handleTabClick = (tab: any) => {
     setActiveTab(tab);
-    setIsOpen(false); // Chiude il menu dopo il click su mobile
+    setIsOpen(false); 
   };
 
   return (
     <nav className="navbar">
       <div className="logo">HOME</div>
 
-      {/* Pulsante Hamburger */}
-      <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
+      {/* Pulsante Hamburger - DEVE ESSERE FUORI DA NAV-TABS */}
+      <button 
+        className="hamburger" 
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Menu"
+      >
         <span className={`bar ${isOpen ? 'open' : ''}`}></span>
         <span className={`bar ${isOpen ? 'open' : ''}`}></span>
         <span className={`bar ${isOpen ? 'open' : ''}`}></span>
