@@ -13,8 +13,7 @@ const NotificationWidget: React.FC = () => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // @ts-ignore
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
   const fetchNotifications = async () => {
     const token = localStorage.getItem('token');
