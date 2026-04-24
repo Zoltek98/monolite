@@ -467,43 +467,55 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
   transition: 0.3s;
 }
 
-/* --- MOBILE RESPONSIVE (Sotto i 768px) --- */
 @media (max-width: 768px) {
-  .hamburger {
-    display: flex; /* Ora è visibile! */
-  }
-
+  /* 1. Forza la scomparsa dei tab standard se non sono 'mobile-open' */
   .nav-tabs {
-    /* Trasformiamo la barra orizzontale in un menu a tendina/laterale */
+    display: flex; /* Lo teniamo flex ma... */
+    pointer-events: none; /* Impedisce click quando è chiuso e invisibile */
+    visibility: hidden;   /* Lo nasconde completamente ai lettori e alla vista */
     position: fixed;
-    right: -100%; /* Inizia fuori dallo schermo a destra */
+    right: -100%;
     top: 0;
     flex-direction: column;
     background-color: var(--bg-card);
-    width: 70%; /* Prende il 70% della larghezza */
+    width: 75%; 
     height: 100vh;
     padding: 80px 20px;
-    transition: 0.4s ease-in-out;
-    box-shadow: -10px 0 20px rgba(0,0,0,0.5);
-    gap: 20px;
-    display: flex; /* Sovrascrive eventuali display:none */
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    gap: 10px;
+    z-index: 999;
   }
 
-  /* Quando lo stato React aggiunge questa classe, il menu entra */
+  /* 2. Quando è aperto, lo rendiamo cliccabile e visibile */
   .nav-tabs.mobile-open {
-    right: 0; 
+    right: 0;
+    visibility: visible;
+    pointer-events: auto;
   }
 
-  .nav-tabs button {
+  /* 3. Sistemiamo i link/bottoni per il layout verticale */
+  .nav-tabs a, .nav-tabs button {
     width: 100%;
-    font-size: 1.2rem;
-    padding: 15px;
-    border-bottom: 1px solid #334155 !important;
-    text-align: left;
+    font-size: 1.1rem;
+    padding: 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important; /* Riga sottile tra voci */
+    border-left: 4px solid transparent; /* Spostiamo l'indicatore 'active' a sinistra */
+    justify-content: flex-start;
+    box-sizing: border-box;
   }
-  
-  /* Animazione per la X */
-  .bar.open:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-  .bar.open:nth-child(2) { opacity: 0; }
-  .bar.open:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+  /* 4. Cambiamo l'indicatore di stato attivo da sotto a lato */
+  .nav-tabs a.active, .nav-tabs button.active {
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    border-left: 4px solid var(--primary);
+    background: rgba(56, 189, 248, 0.1);
+  }
+
+  .hamburger {
+    display: flex;
+    /* Importante: assicurati che sia sopra a tutto */
+    position: relative;
+    z-index: 1100;
+  }
 }
