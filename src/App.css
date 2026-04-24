@@ -434,48 +434,76 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
   transform-origin: 1px;
 }
 
-/* Media Query per Mobile (es. sotto i 768px) */
+/* --- STILI BASE NAVBAR (DESKTOP) --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Di base, nascondiamo l'hamburger su schermi grandi */
+.hamburger {
+  display: none; 
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1100;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* --- MOBILE RESPONSIVE (Sotto i 768px) --- */
 @media (max-width: 768px) {
   .hamburger {
-    display: flex; /* Mostra l'hamburger */
+    display: flex; /* Ora è visibile! */
   }
 
   .nav-tabs {
+    /* Trasformiamo la barra orizzontale in un menu a tendina/laterale */
     position: fixed;
+    right: -100%; /* Inizia fuori dallo schermo a destra */
     top: 0;
-    right: 0;
-    height: 100vh;
-    width: 250px;
+    flex-direction: column;
     background-color: var(--bg-card);
-    flex-direction: column; /* Colonna invece di riga */
-    padding-top: 5rem;
-    gap: 1rem;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(100%); /* Nascondi fuori schermo */
-    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-    z-index: 99;
+    width: 70%; /* Prende il 70% della larghezza */
+    height: 100vh;
+    padding: 80px 20px;
+    transition: 0.4s ease-in-out;
+    box-shadow: -10px 0 20px rgba(0,0,0,0.5);
+    gap: 20px;
+    display: flex; /* Sovrascrive eventuali display:none */
   }
 
+  /* Quando lo stato React aggiunge questa classe, il menu entra */
   .nav-tabs.mobile-open {
-    transform: translateX(0); /* Mostra menu */
+    right: 0; 
   }
 
   .nav-tabs button {
     width: 100%;
+    font-size: 1.2rem;
+    padding: 15px;
+    border-bottom: 1px solid #334155 !important;
     text-align: left;
-    padding: 1rem 2rem;
-    border-bottom: none;
-    border-left: 4px solid transparent;
   }
-
-  .nav-tabs button.active {
-    border-bottom: none;
-    border-left: 4px solid var(--primary);
-    background: rgba(56, 189, 248, 0.1);
-  }
-
-  /* Animazione Hamburger a X quando aperto */
-  .bar.open:nth-child(1) { transform: rotate(45deg); }
+  
+  /* Animazione per la X */
+  .bar.open:nth-child(1) { transform: translateY(9px) rotate(45deg); }
   .bar.open:nth-child(2) { opacity: 0; }
-  .bar.open:nth-child(3) { transform: rotate(-45deg); }
+  .bar.open:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 }
