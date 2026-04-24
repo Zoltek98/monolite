@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
-  activeTab: string;
-  setActiveTab: (tab: any) => void;
+  onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTabClick = (tab: any) => {
-    setActiveTab(tab);
-    setIsOpen(false); 
-  };
+  // Chiude il menu mobile quando si clicca su un link
+  const closeMenu = () => setIsOpen(false);
 
   return (
     <nav className="navbar">
-      <div className="logo">HOME</div>
+      <div className="logo">MYHOME</div>
 
-      {/* Pulsante Hamburger - DEVE ESSERE FUORI DA NAV-TABS */}
       <button 
         className="hamburger" 
         onClick={() => setIsOpen(!isOpen)}
@@ -29,29 +26,27 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
       </button>
 
       <div className={`nav-tabs ${isOpen ? 'mobile-open' : ''}`}>
-        <button 
-          className={activeTab === 'mutuo' ? 'active' : ''} 
-          onClick={() => handleTabClick('mutuo')}
-        >
-          Mutuo
-        </button>
-        <button 
-          className={activeTab === 'luce' ? 'active' : ''} 
-          onClick={() => handleTabClick('luce')}
-        >
-          Luce
-        </button>
-        <button 
-          className={activeTab === 'gas' ? 'active' : ''} 
-          onClick={() => handleTabClick('gas')}
-        >
-          Gas
-        </button>
-        <button 
-          className={activeTab === 'investimenti' ? 'active' : ''} 
-          onClick={() => handleTabClick('investimenti')}
-        >
+        <NavLink to="/" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
+          Dashboard
+        </NavLink>
+        <NavLink to="/investimenti" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
           Investimenti
+        </NavLink>
+        <NavLink to="/mutuo" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
+          Mutuo
+        </NavLink>
+        <NavLink to="/luce" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
+          Luce
+        </NavLink>
+        <NavLink to="/gas" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
+          Gas
+        </NavLink>
+        <NavLink to="/notifications" onClick={closeMenu} className={({ isActive }) => isActive ? "active" : ""}>
+          Notifications
+        </NavLink>
+        
+        <button onClick={() => { onLogout(); closeMenu(); }} className="btn-logout">
+          Esci
         </button>
       </div>
     </nav>
