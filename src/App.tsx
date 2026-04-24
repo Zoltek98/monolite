@@ -11,6 +11,7 @@ import InvestmentsSection from './sections/InvestmentsSection';
 import Login from './sections/Login'; // Assicurati di creare questo file
 
 import './App.css';
+import NotificationWidget from './sections/Notifications';
 
 const App: React.FC = () => {
   // 1. Recuperiamo il token dal localStorage all'avvio
@@ -72,6 +73,9 @@ const App: React.FC = () => {
             <NavLink to="/gas" className={({ isActive }) => isActive ? "active" : ""}>
               Gas
             </NavLink>
+             <NavLink to="/notifications" className={({ isActive }) => isActive ? "active" : ""}>
+              Notifications
+            </NavLink>
             {/* Pulsante Logout integrato */}
             <button onClick={handleLogout} className="btn-logout">
                Esci
@@ -87,6 +91,7 @@ const App: React.FC = () => {
             <Route path="/mutuo" element={<MutuoSection />} />
             <Route path="/luce" element={<LuceSection />} />
             <Route path="/gas" element={<GasSection />} />
+            <Route path="/notifications" element={<NotificationWidget />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

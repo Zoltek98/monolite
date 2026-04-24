@@ -371,3 +371,38 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
   align-items: center;
   background-color: var(--bg-dark);
 }
+
+
+.notification-card {
+  background: #1e293b;
+  border-left: 4px solid #38bdf8;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  border-radius: 0 8px 8px 0;
+  transition: transform 0.2s;
+}
+
+.notification-card:hover {
+  transform: translateX(5px);
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge.luce { background: #fbbf24; color: #000; }
+.badge.gas { background: #ef4444; color: #fff; }
+.badge.mutuo { background: #3b82f6; color: #fff; }
+
+.timestamp { color: #94a3b8; }
+.notification-body { margin: 0; color: #e2e8f0; line-height: 1.4; }
