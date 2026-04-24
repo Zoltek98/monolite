@@ -406,3 +406,76 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
 
 .timestamp { color: #94a3b8; }
 .notification-body { margin: 0; color: #e2e8f0; line-height: 1.4; }
+
+
+/* --- HAMBURGER MENU STYLES --- */
+
+/* Nascondi il pulsante su desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+}
+
+.bar {
+  width: 2rem;
+  height: 0.25rem;
+  background: var(--primary);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+/* Media Query per Mobile (es. sotto i 768px) */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex; /* Mostra l'hamburger */
+  }
+
+  .nav-tabs {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: var(--bg-card);
+    flex-direction: column; /* Colonna invece di riga */
+    padding-top: 5rem;
+    gap: 1rem;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%); /* Nascondi fuori schermo */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    z-index: 99;
+  }
+
+  .nav-tabs.mobile-open {
+    transform: translateX(0); /* Mostra menu */
+  }
+
+  .nav-tabs button {
+    width: 100%;
+    text-align: left;
+    padding: 1rem 2rem;
+    border-bottom: none;
+    border-left: 4px solid transparent;
+  }
+
+  .nav-tabs button.active {
+    border-bottom: none;
+    border-left: 4px solid var(--primary);
+    background: rgba(56, 189, 248, 0.1);
+  }
+
+  /* Animazione Hamburger a X quando aperto */
+  .bar.open:nth-child(1) { transform: rotate(45deg); }
+  .bar.open:nth-child(2) { opacity: 0; }
+  .bar.open:nth-child(3) { transform: rotate(-45deg); }
+}

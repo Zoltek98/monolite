@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface NavbarProps {
   activeTab: 'mutuo' | 'luce' | 'gas' | 'investimenti';
@@ -6,31 +6,46 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleTabClick = (tab: 'mutuo' | 'luce' | 'gas' | 'investimenti') => {
+    setActiveTab(tab);
+    setIsOpen(false); // Chiude il menu dopo il click su mobile
+  };
+
   return (
     <nav className="navbar">
-      <div className="logo">RASPBERRY-HOME</div>
-      <div className="nav-tabs">
+      <div className="logo">HOME</div>
+
+      {/* Pulsante Hamburger */}
+      <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
+        <span className={`bar ${isOpen ? 'open' : ''}`}></span>
+        <span className={`bar ${isOpen ? 'open' : ''}`}></span>
+        <span className={`bar ${isOpen ? 'open' : ''}`}></span>
+      </button>
+
+      <div className={`nav-tabs ${isOpen ? 'mobile-open' : ''}`}>
         <button 
           className={activeTab === 'mutuo' ? 'active' : ''} 
-          onClick={() => setActiveTab('mutuo')}
+          onClick={() => handleTabClick('mutuo')}
         >
           Mutuo
         </button>
         <button 
           className={activeTab === 'luce' ? 'active' : ''} 
-          onClick={() => setActiveTab('luce')}
+          onClick={() => handleTabClick('luce')}
         >
           Luce
         </button>
-         <button 
+        <button 
           className={activeTab === 'gas' ? 'active' : ''} 
-          onClick={() => setActiveTab('gas')}
+          onClick={() => handleTabClick('gas')}
         >
           Gas
         </button>
-         <button 
+        <button 
           className={activeTab === 'investimenti' ? 'active' : ''} 
-          onClick={() => setActiveTab('investimenti')}
+          onClick={() => handleTabClick('investimenti')}
         >
           Investimenti
         </button>
