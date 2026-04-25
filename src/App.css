@@ -519,3 +519,58 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
     z-index: 1100;
   }
 }
+
+/* Layout base per i gruppi */
+.nav-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-title {
+  padding: 10px 15px;
+  font-weight: bold;
+  color: #666;
+  cursor: default;
+}
+
+/* Dropdown su Desktop */
+@media (min-width: 769px) {
+  .nav-group {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    background: white;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 4px;
+  }
+
+  .nav-group:hover .dropdown-content {
+    display: block;
+  }
+
+  .dropdown-content a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+  }
+
+  .dropdown-content a:hover {
+    background-color: #f1f1f1;
+  }
+}
+
+/* Mobile: mostriamo tutto in colonna o con un piccolo indent */
+@media (max-width: 768px) {
+  .dropdown-content {
+    padding-left: 20px; /* Indent per far capire che sono sotto-voci */
+  }
+}
