@@ -4,7 +4,7 @@ import axios from 'axios';
 interface SummaryData {
   mortgage: number;
   portfolio: number;
-  luce: { price: number; kWh: number; month: number; year: number } | null;
+  luce: { price: number; kwh: number; month: number; year: number } | null;
   gas: { price: number; mc: number; month: number; year: number } | null;
 }
 
@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
           {data.luce ? (
             <>
               <p className="value">{Number(data.luce.price).toFixed(2)}€</p>
-              <p className="sub-value">{data.luce.kWh || "-"} kWh - {data.luce.month}/{data.luce.year}</p>
+              <p className="sub-value">{data.luce.kwh || "-"} kWh - {data.luce.month}/{data.luce.year}</p>
             </>
           ) : <p>Nessun dato</p>}
         </div>
