@@ -16,34 +16,46 @@ const Home3D = () => {
     return '#ff4400'; 
   };
 
-  const updateVisuals = (splineApp: any, data: any[]) => {
-    data.forEach((sensor: any) => {
-      // In Spline i nomi degli oggetti devono corrispondere a Floor_NomeNelDB
-      const floorName = `Floor_${sensor.name}`;
-      const sensorName = `Sensor_${sensor.name}`;
-      
-      const floorObj = splineApp.findObjectByName(floorName);
-      const sensorObj = splineApp.findObjectByName(sensorName);
-      const color = getTempColor(sensor.temperature);
+ const updateVisuals = (splineApp: any, data: any[]) => {
+  data.forEach((sensor: any) => {
+    const floorName = `Floor_${sensor.name}`;
+    const sensorName = `Sensor_${sensor.name}`;
+    
+    const floorObj = splineApp.findObjectByName(floorName);
+    const sensorObj = splineApp.findObjectByName(sensorName);
+    const color = getTempColor(sensor.temperature);
 
-      console.log(`Verifica ${sensor.name}:`, { 
-        cercato: floorName, 
-        trovato: floorObj ? "SÌ" : "NO",
-        colore: color 
-      });
+    // Funzione interna per applicare il colore in modo sicuro
+    const applyColor = (obj: any) => {
+      if (!obj) return;
 
-      // Applichiamo il colore al materiale del pavimento
-      if (floorObj && floorObj.material) {
-        floorObj.material.color.set(color);
+      // Metodo 1: Accesso diretto (se l'oggetto ha un solo materiale semplice)
+      if (obj.material && obj.material.color) {
+        obj.material.color.set(color);
+      } 
+      // Metodo 2: Spline spesso usa i variabili o materiali multipli
+      // Proviamo a settare la proprietà 'Color' se l'hai definita così nell'editor
+      else {
+        try {
+           // Molte versioni di Spline API preferiscono questo per i materiali di libreria
+           splineApp.setVariable(obj.name, color); 
+        } catch (e) {
+           console.warn(`Non sono riuscito a mappare il colore su ${obj.name}`);
+        }
       }
-      
-      // Applichiamo il colore alla sfera del sensore
-      if (sensorObj && sensorObj.material) {
-        sensorObj.material.color.set(color);
-        sensorObj.visible = true;
-      }
-    });
-  };
+    };
+
+    if (floorObj) {
+      console.log(`Applicando ${color} a ${floorName}`);
+      applyColor(floorObj);
+    }
+
+    if (sensorObj) {
+      applyColor(sensorObj);
+      sensorObj.visible = true;
+    }
+  });
+};
 
   const fetchData = async () => {
     const token = localStorage.getItem('token');
