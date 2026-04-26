@@ -66,7 +66,7 @@ const fetchData = async () => {
     } catch (error) {
       console.error("Errore nel fetch:", error);
       // Mock di dati per testare il 3D se il server è giù
-      const mockData = [{ name: 'Piano terra', temperature: 20.4 }]; 
+      const mockData = [{ name: 'terra', temperature: 20.4 }]; 
       if (splineRef.current) updateVisuals(splineRef.current, mockData);
     }
   };
