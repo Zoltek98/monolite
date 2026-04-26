@@ -46,13 +46,28 @@ const Home3D = () => {
     fetchData();
   }
 
-  const fetchData = async () => {
-    const res = await fetch('/api/home-status');
-    const data = await res.json();
-    setSensorData(data);
-    
-    if (splineRef.current) {
-      updateVisuals(splineRef.current, data);
+const fetchData = async () => {
+    try {
+      const res = await fetch('/api/home-status');
+      
+      // Controllo se la risposta è effettivamente JSON
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new TypeError("Oops, non abbiamo ricevuto un JSON dal server!");
+      }
+
+      const data = await res.json();
+      console.log("Dati ricevuti dal DB:", data);
+      setSensorData(data);
+      
+      if (splineRef.current) {
+        updateVisuals(splineRef.current, data);
+      }
+    } catch (error) {
+      console.error("Errore nel fetch:", error);
+      // Mock di dati per testare il 3D se il server è giù
+      const mockData = [{ name: 'Piano terra', temperature: 20.4 }]; 
+      if (splineRef.current) updateVisuals(splineRef.current, mockData);
     }
   };
 
