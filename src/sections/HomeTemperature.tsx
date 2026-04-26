@@ -25,6 +25,7 @@ const Home3D = () => {
       const floorObj = splineApp.findObjectByName(floorName);
       const sensorObj = splineApp.findObjectByName(sensorName);
       const color = getTempColor(sensor.temperature);
+      console.log(floorObj, sensorObj,sensor);
 
       if (floorObj) {
         // Cambiamo il colore del materiale del pavimento
