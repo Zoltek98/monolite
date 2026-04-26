@@ -26,38 +26,28 @@ const Home3D = () => {
     const color = getTempColor(sensor.temperature);
 
     // Funzione di applicazione colore sicura
-    const applyColorToMesh = (obj:any, name:any) => {
-        if (!obj) {
-            console.warn(`Mesh ${name} non trovata.`);
-            return;
-        }
+    const applyColorToMesh = (obj:any, color:any) => {
+  if (!obj) return;
 
-        const color = getTempColor(sensor.temperature); // Assicurati che 'color' sia accessibile
+  // Spline Runtime API: prova a settare il colore tramite lo stato
+  try {
+    // 1. Prova il metodo diretto della Runtime API
+    obj.offset.x = obj.offset.x; // Trigger per il refresh interno
 
-        try {
-            if (obj.material && obj.material.layers) {
-            // Cicliamo i layer del materiale (Color, Fresnel, Noise, ecc.)
-            obj.material.layers.forEach((layer:any) => {
-                // Se il layer ha una proprietà color, la aggiorniamo
-                if (layer.color) {
-                // Spline accetta stringhe HEX direttamente nei layer
-                layer.color = color;
-                console.log(`Layer aggiornato per ${name} con colore ${color}`);
-                }
-            });
-            } else if (obj.material && obj.material.color) {
-            // Fallback per materiali semplici senza layers
-            obj.material.color.set(color);
-            }
-            
-            // Alcuni oggetti hanno bisogno di un reset della visibilità per "svegliarsi"
-            obj.visible = false;
-            obj.visible = true;
-
-        } catch (e) {
-            console.error(`Errore nel cambio colore per ${name}:`, e);
-        }
-        };
+    // 2. Cerca il layer di tipo 'Color' e forzalo
+    if (obj.material && obj.material.layers) {
+      const colorLayer = obj.material.layers.find((l:any) => l.type === 'Color' || l.name === 'Color');
+      if (colorLayer) {
+        colorLayer.color = color;
+      } else {
+        // Se non trova il layer specifico, prova a settare il primo layer disponibile
+        obj.material.layers[0].color = color;
+      }
+    }
+  } catch (e) {
+    console.error("Errore nel brute force del colore:", e);
+  }
+};
 
     console.log(`Tentativo aggiornamento: ${sensor.name} -> ${color}`);
     applyColorToMesh(floorObj, floorName);
