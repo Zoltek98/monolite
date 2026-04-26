@@ -15,6 +15,7 @@ import Login from './sections/Login';
 import NotificationWidget from './sections/Notifications';
 
 import './App.css';
+import Home3D from './sections/HomeTemperature';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -64,6 +65,7 @@ const App: React.FC = () => {
             <Route path="/luce" element={<LuceSection />} />
             <Route path="/gas" element={<GasSection />} />
             <Route path="/notifications" element={<NotificationWidget />} />
+            <Route path="/house" element={<Home3D />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

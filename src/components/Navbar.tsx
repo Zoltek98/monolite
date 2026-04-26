@@ -40,12 +40,13 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
         {/* GRUPPO SPESE / CASA */}
         <div className="nav-group">
-          <span className="group-title">Spese Casa</span>
+          <span className="group-title">Casa</span>
           <div className="dropdown-content">
             <NavLink to="/mutuo" onClick={closeMenu}>Mutuo</NavLink>
             <NavLink to="/luce" onClick={closeMenu}>Luce</NavLink>
             <NavLink to="/gas" onClick={closeMenu}>Gas</NavLink>
             <NavLink to="/internet" onClick={closeMenu}>Internet</NavLink>
+            <NavLink to="/house" onClick={closeMenu}>Casa</NavLink>
           </div>
         </div>
 
