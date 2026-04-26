@@ -27,23 +27,39 @@ const Home3D = () => {
 
     // Funzione di applicazione colore sicura
     const applyColorToMesh = (obj:any, name:any) => {
-      if (!obj) {
-        console.warn(`Mesh ${name} non trovata nella scena.`);
-        return;
-      }
+  if (!obj) {
+    console.warn(`Mesh ${name} non trovata.`);
+    return;
+  }
 
-      // Spline aggiorna il colore tramite questa gerarchia per le mesh
-      if (obj.material && obj.material.color) {
+  // Debug per vedere cosa c'è dentro il materiale del pavimento
+  console.log(`Struttura materiale di ${name}:`, obj.material);
+
+  try {
+    // Forza l'aggiornamento del colore su più livelli possibili
+    if (obj.material) {
+      // Opzione A: Colore diretto
+      if (obj.material.color) {
         obj.material.color.set(color);
-      } else if (obj.children) {
-        // A volte l'oggetto importato è un gruppo, proviamo sui figli
-        obj.children.forEach((child:any) => {
-          if (child.material && child.material.color) {
-            child.material.color.set(color);
+      }
+      
+      // Opzione B: Se il materiale ha dei layer (comune in Spline)
+      if (obj.material.layers) {
+        obj.material.layers.forEach((layer:any) => {
+          if (layer.type === 'Color' || layer.id) {
+            layer.color = color;
           }
         });
       }
-    };
+    }
+    
+    // Forza il refresh del rendering per quell'oggetto
+    obj.needsUpdate = true;
+    
+  } catch (e) {
+    console.error(`Errore nel settare il colore su ${name}:`, e);
+  }
+};
 
     console.log(`Tentativo aggiornamento: ${sensor.name} -> ${color}`);
     applyColorToMesh(floorObj, floorName);
