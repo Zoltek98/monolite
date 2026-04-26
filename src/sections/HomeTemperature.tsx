@@ -16,42 +16,30 @@ const Home3D = () => {
     return '#ff4400'; 
   };
 
- const updateVisuals = (splineApp:any, data:any) => {
-  data.forEach((sensor:any) => {
-    const floorName = `Floor_${sensor.name}`;
-    const sensorName = `Sensor_${sensor.name}`;
-    
-    const floorObj = splineApp.findObjectByName(floorName);
-    const sensorObj = splineApp.findObjectByName(sensorName);
+const updateVisuals = (splineApp: any, data: any[]) => {
+  data.forEach((sensor: any) => {
+    // 1. Calcoliamo il colore in base alla temperatura
     const color = getTempColor(sensor.temperature);
+    
+    // 2. Definiamo il nome della variabile (deve essere identica a quella in Spline)
+    // Se in Spline l'hai chiamata "colore_corte", il sensore nel DB deve chiamarsi "corte"
+    const variableName = `colore_${sensor.name}`; 
 
-    // Funzione di applicazione colore sicura
-    const applyColorToMesh = (obj:any, color:any) => {
-  if (!obj) return;
-
-  // Spline Runtime API: prova a settare il colore tramite lo stato
-  try {
-    // 1. Prova il metodo diretto della Runtime API
-    obj.offset.x = obj.offset.x; // Trigger per il refresh interno
-
-    // 2. Cerca il layer di tipo 'Color' e forzalo
-    if (obj.material && obj.material.layers) {
-      const colorLayer = obj.material.layers.find((l:any) => l.type === 'Color' || l.name === 'Color');
-      if (colorLayer) {
-        colorLayer.color = color;
-      } else {
-        // Se non trova il layer specifico, prova a settare il primo layer disponibile
-        obj.material.layers[0].color = color;
-      }
+    try {
+      // 3. Il comando magico: setVariable
+      // Questo cambia il colore globalmente ovunque sia collegata la variabile
+      splineApp.setVariable(variableName, color);
+      
+      console.log(`✅ Aggiornamento riuscito: ${variableName} impostata a ${color}`);
+    } catch (e) {
+      console.warn(`❌ Variabile "${variableName}" non trovata nella scena. Controlla il nome in Spline!`);
     }
-  } catch (e) {
-    console.error("Errore nel brute force del colore:", e);
-  }
-};
 
-    console.log(`Tentativo aggiornamento: ${sensor.name} -> ${color}`);
-    applyColorToMesh(floorObj, floorName);
-    applyColorToMesh(sensorObj, sensorName);
+    // Nota: Se vuoi comunque provare a nascondere/mostrare la mesh del sensore:
+    const sensorObj = splineApp.findObjectByName(`Sensor_${sensor.name}`);
+    if (sensorObj) {
+      sensorObj.visible = true;
+    }
   });
 };
 
