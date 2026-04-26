@@ -90,7 +90,6 @@ const Home3D = () => {
   function onLoad(splineApp: any) {
     splineRef.current = splineApp;
     // Log per debuggare i nomi degli oggetti reali caricati da Spline
-    splineApp.setBackgroundColor('#ff0000');
     console.log("Oggetti nella scena:", splineApp.getAllObjects());
     fetchData();
   }
