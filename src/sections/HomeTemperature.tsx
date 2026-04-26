@@ -1,110 +1,101 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
-import axios from 'axios'; // Assicurati di aver fatto: npm install axios
+import axios from 'axios';
+
+// Recupero l'URL dal file .env (assicurati di avere VITE_API_URL nel tuo file .env)
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.casa-boschetto.com';
 
 const Home3D = () => {
-  const [sensorData, setSensorData] = useState([]);
-  const splineRef = useRef(null);
+  const [sensorData, setSensorData] = useState<any[]>([]);
+  const splineRef = useRef<any>(null);
 
-  // 1. Funzione per convertire Temperatura in Colore (HEX)
-  const getTempColor = (temp: any) => {
-    if (temp <= 18) return '#00aaff'; // Freddo
-    if (temp <= 21) return '#00ffaa'; // Ideale
-    if (temp <= 23) return '#ffaa00'; // Tiepido
-    return '#ff4400'; // Caldo
+  const getTempColor = (temp: number) => {
+    if (temp <= 18) return '#00aaff'; 
+    if (temp <= 21) return '#00ffaa'; 
+    if (temp <= 23) return '#ffaa00'; 
+    return '#ff4400'; 
   };
 
-  // 2. Funzione che aggiorna il modello 3D
-  const updateVisuals = (splineApp: any, data: any) => {
+  const updateVisuals = (splineApp: any, data: any[]) => {
     data.forEach((sensor: any) => {
-      // Pulizia del nome: trasformiamo spazi in underscore se necessario 
-      // (Dipende da come hai nominato gli oggetti in Spline)
-      const sanitizedName = sensor.name.replace(/\s+/g, '_'); 
-      
-      const floorName = `Floor_${sensor.name}`; // Prova prima con nome esatto
+      // In Spline i nomi degli oggetti devono corrispondere a Floor_NomeNelDB
+      const floorName = `Floor_${sensor.name}`;
       const sensorName = `Sensor_${sensor.name}`;
       
       const floorObj = splineApp.findObjectByName(floorName);
       const sensorObj = splineApp.findObjectByName(sensorName);
       const color = getTempColor(sensor.temperature);
 
-      console.log(`Update ${sensor.name}:`, { floorObj, sensorObj, color });
+      console.log(`Verifica ${sensor.name}:`, { 
+        cercato: floorName, 
+        trovato: floorObj ? "SÌ" : "NO",
+        colore: color 
+      });
 
-      if (floorObj) {
-        // Applichiamo il colore al materiale
-        if (floorObj.material) {
-          floorObj.material.color.set(color);
-        }
+      // Applichiamo il colore al materiale del pavimento
+      if (floorObj && floorObj.material) {
+        floorObj.material.color.set(color);
       }
       
-      if (sensorObj) {
-        if (sensorObj.material) {
-          sensorObj.material.color.set(color);
-        }
-        sensorObj.visible = true; // Forza visibilità
+      // Applichiamo il colore alla sfera del sensore
+      if (sensorObj && sensorObj.material) {
+        sensorObj.material.color.set(color);
+        sensorObj.visible = true;
       }
     });
   };
 
   const fetchData = async () => {
     const token = localStorage.getItem('token');
-    
     try {
-      const res = await axios.get('/api/home-status', {
+      // Chiamata all'URL assoluto del backend
+      const res = await axios.get(`${API_URL}/api/home-status`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      console.log("Dati ricevuti da Axios:", res.data);
-      setSensorData(res.data);
-      
-      if (splineRef.current) {
-        updateVisuals(splineRef.current, res.data);
+      if (Array.isArray(res.data)) {
+        setSensorData(res.data);
+        if (splineRef.current) {
+          updateVisuals(splineRef.current, res.data);
+        }
       }
     } catch (error: any) {
-      console.error("Errore nel fetch con Axios:", error.response?.data || error.message);
-      
-      // Fallback per test visivo se il server non risponde
-      const mockData = [{ name: 'Piano terra', temperature: 20.4 }]; 
-      if (splineRef.current) updateVisuals(splineRef.current, mockData);
+      console.error("Errore Fetch API:", error.response?.data || error.message);
     }
   };
 
   function onLoad(splineApp: any) {
     splineRef.current = splineApp;
+    // Log per debuggare i nomi degli oggetti reali caricati da Spline
+    console.log("Oggetti nella scena:", splineApp.getAllObjects());
     fetchData();
   }
 
   useEffect(() => {
-    // Polling ogni 5 minuti
-    const interval = setInterval(fetchData, 300000);
+    const interval = setInterval(fetchData, 300000); // 5 min
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div style={{ width: '100%', height: '100vh', background: '#000', position: 'relative' }}>
-      {/* Overlay Dati Leggibili */}
       <div style={{ 
-        position: 'absolute', 
-        top: '20px', 
-        left: '20px', 
-        padding: '20px', 
-        color: 'white', 
-        zIndex: 10,
-        background: 'rgba(0,0,0,0.5)',
-        borderRadius: '8px',
-        pointerEvents: 'none' // Permette di cliccare il 3D attraverso il testo
+        position: 'absolute', top: '20px', left: '20px', padding: '20px', 
+        color: 'white', zIndex: 10, background: 'rgba(0,0,0,0.6)',
+        borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)',
+        pointerEvents: 'none', backdropFilter: 'blur(4px)'
       }}>
-        <h1 style={{ margin: '0 0 10px 0', fontSize: '20px' }}>Monolite Home 3D</h1>
+        <h1 style={{ margin: '0 0 15px 0', fontSize: '18px', letterSpacing: '1px' }}>CASA BOSCHETTO 3D</h1>
         {sensorData.length > 0 ? sensorData.map((s: any) => (
-          <div key={s.device_id} style={{ marginBottom: '5px' }}>
-            {s.name}: <span style={{ color: getTempColor(s.temperature), fontWeight: 'bold' }}>
+          <div key={s.device_id} style={{ marginBottom: '8px', fontSize: '14px' }}>
+            <span style={{ opacity: 0.7 }}>{s.name}:</span> 
+            <span style={{ color: getTempColor(s.temperature), marginLeft: '8px', fontWeight: 'bold' }}>
               {s.temperature}°C
             </span>
           </div>
-        )) : <p>Caricamento dati...</p>}
+        )) : <p style={{ fontSize: '12px', opacity: 0.5 }}>In attesa dei sensori...</p>}
       </div>
       
       <Spline 
