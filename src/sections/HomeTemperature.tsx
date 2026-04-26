@@ -16,8 +16,8 @@ const Home3D = () => {
     return '#ff4400'; 
   };
 
- const updateVisuals = (splineApp: any, data: any[]) => {
-  data.forEach((sensor: any) => {
+ const updateVisuals = (splineApp:any, data:any) => {
+  data.forEach((sensor:any) => {
     const floorName = `Floor_${sensor.name}`;
     const sensorName = `Sensor_${sensor.name}`;
     
@@ -25,35 +25,29 @@ const Home3D = () => {
     const sensorObj = splineApp.findObjectByName(sensorName);
     const color = getTempColor(sensor.temperature);
 
-    // Funzione interna per applicare il colore in modo sicuro
-    const applyColor = (obj: any) => {
-      if (!obj) return;
+    // Funzione di applicazione colore sicura
+    const applyColorToMesh = (obj:any, name:any) => {
+      if (!obj) {
+        console.warn(`Mesh ${name} non trovata nella scena.`);
+        return;
+      }
 
-      // Metodo 1: Accesso diretto (se l'oggetto ha un solo materiale semplice)
+      // Spline aggiorna il colore tramite questa gerarchia per le mesh
       if (obj.material && obj.material.color) {
         obj.material.color.set(color);
-      } 
-      // Metodo 2: Spline spesso usa i variabili o materiali multipli
-      // Proviamo a settare la proprietà 'Color' se l'hai definita così nell'editor
-      else {
-        try {
-           // Molte versioni di Spline API preferiscono questo per i materiali di libreria
-           splineApp.setVariable(obj.name, color); 
-        } catch (e) {
-           console.warn(`Non sono riuscito a mappare il colore su ${obj.name}`);
-        }
+      } else if (obj.children) {
+        // A volte l'oggetto importato è un gruppo, proviamo sui figli
+        obj.children.forEach((child:any) => {
+          if (child.material && child.material.color) {
+            child.material.color.set(color);
+          }
+        });
       }
     };
 
-    if (floorObj) {
-      console.log(`Applicando ${color} a ${floorName}`);
-      applyColor(floorObj);
-    }
-
-    if (sensorObj) {
-      applyColor(sensorObj);
-      sensorObj.visible = true;
-    }
+    console.log(`Tentativo aggiornamento: ${sensor.name} -> ${color}`);
+    applyColorToMesh(floorObj, floorName);
+    applyColorToMesh(sensorObj, sensorName);
   });
 };
 
