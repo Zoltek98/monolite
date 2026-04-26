@@ -18,31 +18,43 @@ const Home3D = () => {
 
 const updateVisuals = (splineApp: any, data: any[]) => {
   data.forEach((sensor: any) => {
-    // 1. Calcoliamo il colore in base alla temperatura
     const color = getTempColor(sensor.temperature);
     
-    // 2. Definiamo il nome della variabile (deve essere identica a quella in Spline)
-    // Se in Spline l'hai chiamata "colore_corte", il sensore nel DB deve chiamarsi "corte"
-    const variableName = `colore_${sensor.name}`; 
-
-    try {
-      // 3. Il comando magico: setVariable
-      // Questo cambia il colore globalmente ovunque sia collegata la variabile
-      splineApp.setVariable(variableName, color);
-      
-      console.log(`✅ Aggiornamento riuscito: ${variableName} impostata a ${color}`);
-    } catch (e) {
-      console.warn(`❌ Variabile "${variableName}" non trovata nella scena. Controlla il nome in Spline!`);
-    }
-
-    // Nota: Se vuoi comunque provare a nascondere/mostrare la mesh del sensore:
+    // Cerchiamo le mesh per nome
+    const floorObj = splineApp.findObjectByName(`Floor_${sensor.name}`);
     const sensorObj = splineApp.findObjectByName(`Sensor_${sensor.name}`);
-    if (sensorObj) {
-      sensorObj.visible = true;
-    }
+
+    const applyColor = (obj: any, name: string) => {
+      if (!obj) return;
+
+      try {
+        // 1. Controlliamo se l'oggetto ha dei materiali con layer (Standard di Spline)
+        if (obj.material && obj.material.layers) {
+          // Cerchiamo il primo layer che sia di tipo 'Color'
+          const colorLayer = obj.material.layers.find((l: any) => l.type === 'Color' || l.id);
+          
+          if (colorLayer) {
+            colorLayer.color = color;
+            console.log(`✅ Colore applicato al layer di ${name}`);
+          } else {
+            // Se non trova il tipo, prova a forzare il primo layer
+            obj.material.layers[0].color = color;
+          }
+        } 
+        // 2. Fallback per mesh semplici (Three.js style)
+        else if (obj.material && obj.material.color) {
+          obj.material.color.set(color);
+        }
+      } catch (err) {
+        console.error(`Errore su ${name}:`, err);
+      }
+    };
+
+    console.log(`Tentativo su: ${sensor.name}`);
+    applyColor(floorObj, `Floor_${sensor.name}`);
+    applyColor(sensorObj, `Sensor_${sensor.name}`);
   });
 };
-
   const fetchData = async () => {
     const token = localStorage.getItem('token');
     try {
