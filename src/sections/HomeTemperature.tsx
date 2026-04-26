@@ -105,7 +105,7 @@ const Home3D = () => {
       </div>
       
       <Spline 
-        scene="https://prod.spline.design/zsWcmwUSjb9RKyY2/scene.splinecode" 
+        scene="https://prod.spline.design/zsWcmwUSjb9RKyY2/scene.splinecode?v=1" 
         onLoad={onLoad}
       />
     </div>
