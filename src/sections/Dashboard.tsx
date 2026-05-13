@@ -6,6 +6,7 @@ interface SummaryData {
   portfolio: number;
   luce: { price: number; kwh: number; month: number; year: number } | null;
   gas: { price: number; mc: number; month: number; year: number } | null;
+  temperatures: [] | null
 }
 
 const Dashboard: React.FC = () => {
@@ -82,6 +83,33 @@ const Dashboard: React.FC = () => {
             </>
           ) : <p>Nessun dato</p>}
         </div>
+        {/* Card Temperatura Media Casa */}
+      <div className="summary-card bill">
+        <h3>Temperatura media casa</h3>
+        {data.temperatures && data.temperatures.length > 0 ? (
+          (() => {
+            // Filtriamo solo i sensori interni desiderati
+            const indoorSensors = data.temperatures.filter((t:any) => 
+              ["bagno", "primo", "terra"].includes(t.name)
+            );
+
+            // Calcoliamo la media
+            const averageTemp = indoorSensors.reduce((acc, curr:any) => 
+              acc + parseFloat(curr.temperature), 0) / indoorSensors.length;
+
+            return (
+              <>
+                <p className="value">{averageTemp.toFixed(1)}°C</p>
+                <p className="sub-value">
+                  Media di {indoorSensors.length} sensori interni
+                </p>
+              </>
+            );
+          })()
+        ) : (
+          <p>Nessun dato</p>
+        )}
+      </div>
       </div>
     </div>
   );
