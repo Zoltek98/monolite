@@ -38,7 +38,7 @@ const TFRSection: React.FC = () => {
 
   // Calcolo Statistiche
   const stats = useMemo(() => {
-    if (data.tfr_history.length === 0) return null;
+    if (data.tfr_history && data.tfr_history.length === 0) return null;
     const prices = data.tfr_history.map(d => Number(d.valore));
     const max = Math.max(...prices);
     const min = Math.min(...prices);
