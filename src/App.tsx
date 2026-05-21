@@ -16,6 +16,7 @@ import NotificationWidget from './sections/Notifications';
 
 import './App.css';
 import Home3D from './sections/HomeTemperature';
+import TFRSection from './sections/TFR';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -64,6 +65,7 @@ const App: React.FC = () => {
             <Route path="/mutuo" element={<MutuoSection />} />
             <Route path="/luce" element={<LuceSection />} />
             <Route path="/gas" element={<GasSection />} />
+            <Route path="/tfr" element={<TFRSection />} />
             <Route path="/notifications" element={<NotificationWidget />} />
             <Route path="/house" element={<Home3D />} />
             <Route path="*" element={<Navigate to="/" />} />

@@ -252,6 +252,7 @@ tr:hover { background: #1e293b; filter: brightness(1.2); }
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+  max-width: 1295px;
 }
 
 .summary-card {
