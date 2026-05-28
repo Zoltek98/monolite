@@ -5,11 +5,10 @@ import DataTable from '../components/DataTable';
 
 interface TFRModel {
   tfr_history: { valore: number; id: number; data_osservazione: string; created_at: string }[];
-  tfr_quotas: { number: number; id: number; date: string } | null; // Gestiamo il caso in cui sia null o assente
+  tfr_quotas: { number: number; id: number; date: string } | null;
 }
 
 const TFRSection: React.FC = () => {
-  // Inizializzazione sicura dello stato per evitare undefined.length
   const [data, setData] = useState<TFRModel>({
     tfr_history: [],
     tfr_quotas: null
@@ -28,8 +27,18 @@ const TFRSection: React.FC = () => {
       }
     })
     .then(res => {
-      res.data.tfr_history = res.data.tfr_history.reverse();
-      setData(res.data);
+      // INTERCETTAZIONE E NORMALIZZAZIONE DEI DATI MALFORMATI
+      // Se l'API restituisce "14.7020" come stringa, qui lo trasformiamo in un float JavaScript pulito (14.702)
+      const rawData = res.data;
+      
+      if (rawData && Array.isArray(rawData.tfr_history)) {
+        rawData.tfr_history = rawData.tfr_history.map((item: any) => ({
+          ...item,
+          valore: Number(item.valore) // Cast sicuro a numero. Gestisce "14.7020" -> 14.702
+        }));
+      }
+
+      setData(rawData);
     })
     .catch(err => {
       console.error("Errore caricamento TFR:", err);
@@ -40,21 +49,20 @@ const TFRSection: React.FC = () => {
     .finally(() => setLoading(false));
   }, [API_URL]);
 
-  // Calcolo Statistiche
+  // Calcolo Statistiche (ora lavora su numeri già puliti)
   const stats = useMemo(() => {
     if (!data.tfr_history || data.tfr_history.length === 0) return null;
-    const prices = data.tfr_history.map(d => Number(d.valore));
+    const prices = data.tfr_history.map(d => d.valore);
     const max = Math.max(...prices);
     const min = Math.min(...prices);
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
 
-    return { max, min, avg };
+    return { max, min, avg };
   }, [data.tfr_history]);
 
   if (loading) return <div className="loading">Analisi dati quote tfr...</div>;
   if (!data.tfr_history || data.tfr_history.length === 0) return <div className="no-data">Nessun dato disponibile per il TFR.</div>;
 
-  // Calcolo sicuro del valore attuale (Prezzo * Numero di quote)
   const quotaNumber = data.tfr_quotas?.number || 0;
   const ultimoPrezzo = data.tfr_history[0]?.valore || 0;
   const valoreAttualeTotale = ultimoPrezzo * quotaNumber;
@@ -71,27 +79,27 @@ const TFRSection: React.FC = () => {
         </div>
         <div className="stat-card">
           <span>Minimo Quota</span>
-          <strong>{stats?.min.toFixed(2)}€</strong>
+          <strong>{stats?.min.toFixed(3)}€</strong> {/* Usato toFixed(3) se vuoi vedere il millesimo come nel DB */}
         </div>
         <div className="stat-card">
           <span>Massimo Quota</span>
-          <strong>{stats?.max.toFixed(2)}€</strong>
+          <strong>{stats?.max.toFixed(3)}€</strong>
         </div>
         <div className="stat-card highlight-mortgage">
           <span>Media Quota</span>
-          <strong>{stats?.avg.toFixed(2)}€</strong>
+          <strong>{stats?.avg.toFixed(3)}€</strong>
         </div>
       </div>
 
       <div className="chart-wrapper" style={{ marginTop: '2rem' }}>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data.tfr_history}>
+          {/* FIX: Usato lo spread operator per non mutare lo stato con .reverse() */}
+          <LineChart data={[...data.tfr_history].reverse()}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis 
               dataKey="data_osservazione" 
-              tickFormatter={(value:string) => {
+              tickFormatter={(value: string) => {
                 value = value.substring(0,10);
-                // Formatta la data YYYY-MM-DD in qualcosa di più leggibile (es. DD/MM) se vuoi
                 if (!value) return '';
                 const parts = value.split('-');
                 return parts.length === 3 ? `${parts[2]}/${parts[1]}` : value;
@@ -100,13 +108,12 @@ const TFRSection: React.FC = () => {
               tick={{fontSize: 12}}
             />
             <YAxis 
-              domain={['dataMin - 2', 'dataMax + 2']}
+              domain={['dataMin - 1', 'dataMax + 1']} // Ridotto il padding a 1 così il grafico respira ma non si schiaccia
               stroke="#94a3b8" 
-              tickFormatter={(value) => `${value}€`}
+              tickFormatter={(value) => `${value.toFixed(2)}€`}
             />
             <Tooltip 
                labelFormatter={(value) => {
-                 // value qui corrisponde alla data_osservazione impostata come dataKey nell'XAxis
                  if (!value) return '';
                  value = value.substring(0,10);
                  const parts = value.split('-');
@@ -116,7 +123,7 @@ const TFRSection: React.FC = () => {
             />
             <Line 
               type="monotone" 
-              dataKey="valore" // FIX: Cambiato da "price" a "valore" coerentemente con il TFRModel
+              dataKey="valore" 
               name="Valore Quota"
               stroke="#38bdf8" 
               strokeWidth={3} 
@@ -133,10 +140,10 @@ const TFRSection: React.FC = () => {
         renderRow={(item: any) => (
           <tr key={item.id}>
             <td>
-              {item.data_osservazione.substring(0,10).split('-').join('/')}
+              {item.data_osservazione.substring(0,10).split('-').reverse().join('/')}
             </td>
             <td className="price-cell highlight-mortgage">
-              {Number(item.valore).toFixed(3)}€
+              {item.valore.toFixed(4)}€ {/* Mantiene la precisione a 4 decimali solo per la tabella se necessario */}
             </td>
           </tr>
         )}
