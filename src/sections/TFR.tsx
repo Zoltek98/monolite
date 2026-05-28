@@ -88,7 +88,8 @@ const TFRSection: React.FC = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
             <XAxis 
               dataKey="data_osservazione" 
-              tickFormatter={(value) => {
+              tickFormatter={(value:string) => {
+                value = value.substring(0,10);
                 // Formatta la data YYYY-MM-DD in qualcosa di più leggibile (es. DD/MM) se vuoi
                 if (!value) return '';
                 const parts = value.split('-');
@@ -100,13 +101,13 @@ const TFRSection: React.FC = () => {
             <YAxis 
               domain={['dataMin - 5', 'dataMax + 5']} // Ridotto il padding da 20 a 5 per dare più granularità visiva alle quote
               stroke="#94a3b8" 
-              unit="€"
               tickFormatter={(value) => `${value}€`}
             />
             <Tooltip 
                labelFormatter={(value) => {
                  // value qui corrisponde alla data_osservazione impostata come dataKey nell'XAxis
                  if (!value) return '';
+                 value = value.substring(0,10);
                  const parts = value.split('-');
                  return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
                }}
@@ -134,7 +135,7 @@ const TFRSection: React.FC = () => {
               {item.data_osservazione.split('-').reverse().join('/')}
             </td>
             <td className="price-cell highlight-mortgage">
-              {Number(item.valore).toFixed(4)}€
+              {Number(item.valore).toFixed(3)}€
             </td>
           </tr>
         )}

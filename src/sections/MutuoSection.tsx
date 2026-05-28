@@ -101,7 +101,6 @@ const MutuoSection: React.FC = () => {
             <YAxis 
               domain={['dataMin - 20', 'dataMax + 20']} 
               stroke="#94a3b8" 
-              unit="€"
               tickFormatter={(value) => `${value}€`}
             />
             <Tooltip 
