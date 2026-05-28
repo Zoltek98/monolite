@@ -28,6 +28,7 @@ const TFRSection: React.FC = () => {
       }
     })
     .then(res => {
+      res.data.tfr_history = res.data.tfr_history.reverse();
       setData(res.data);
     })
     .catch(err => {
@@ -99,7 +100,7 @@ const TFRSection: React.FC = () => {
               tick={{fontSize: 12}}
             />
             <YAxis 
-              domain={['dataMin - 5', 'dataMax + 5']} // Ridotto il padding da 20 a 5 per dare più granularità visiva alle quote
+              domain={['dataMin - 2', 'dataMax + 2']}
               stroke="#94a3b8" 
               tickFormatter={(value) => `${value}€`}
             />
@@ -132,7 +133,7 @@ const TFRSection: React.FC = () => {
         renderRow={(item: any) => (
           <tr key={item.id}>
             <td>
-              {item.data_osservazione.split('-').reverse().join('/')}
+              {item.data_osservazione.substring(0,10).split('-').join('/')}
             </td>
             <td className="price-cell highlight-mortgage">
               {Number(item.valore).toFixed(3)}€
